@@ -1,0 +1,18 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "jest --config jest.config.ts --detectOpenHandles --coverage --maxWorkers=1",
+    "lint": "tsc",
+    "release": "pnpm run build && changeset publish"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.6",
+    "@solana/web3.js": "^1.93.0",
+    "axios": "^1.7.2",
+    "bs58": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "tsup": "^8.2.1",
+    "typescript": "^5.5.3"
+  }
+}
