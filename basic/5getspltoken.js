@@ -1,5 +1,7 @@
 import { Connection, Keypair, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { getAssociatedTokenAddress, createAssociatedTokenAccount } from "@solana/spl-token";
+import { Metaplex } from '@metaplex-foundation/js';
+import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import base58 from "bs58"
 import "dotenv/config";
 // 转移用户balance
@@ -13,6 +15,13 @@ const owner = new PublicKey(keypair.publicKey)
 
 // mint token (类似于erc20 token)
 const mint = new PublicKey("12zvsv7ku497XkW8MH1DwsuGGRpqh8v5JBgE4DqdHzZy");
+
+// const mintInfo = await client.getParsedAccountInfo(mint)
+const metaplex = Metaplex.make(client);
+const metadataPda = metaplex.nfts().pdas().metadata({ mint: mint });
+
+const account = await Metadata.fromAccountAddress(client, metadataPda);
+console.log(account)
 
 // // 获得 token account (每个wallet account 在 mint token 都有一个 token account)
 // const tokenAccount = await getAssociatedTokenAddress(
