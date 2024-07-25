@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "target": "ES6",                      // 目标JavaScript版本
+      "module": "commonjs",                 // 使用的模块系统
+      "checkJs": true,                      // 启用对JavaScript文件的类型检查
+      "jsx": "preserve",                    // JSX代码处理方式
+      "baseUrl": ".",                       // 以当前目录作为基准
+      "paths": {
+        "@solana/*": ["node_modules/@solana/*"],
+        "bs58": ["node_modules/bs58"]
+      },
+      "allowSyntheticDefaultImports": true  // 允许合成默认导入
+    },
+    "exclude": [
+      "node_modules",                       // 排除node_modules目录
+      "dist"                                // 排除dist目录
+    ]
+  }
+  

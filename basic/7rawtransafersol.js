@@ -25,9 +25,8 @@ transaction.add(sendSolInstruction)
 transaction.recentBlockhash = recentBlockhash.blockhash;
 transaction.feePayer = sender;
 
-const serializedTransaction = transaction.serializeMessage()
 
-console.log(base58.encode(serializedTransaction))
+// console.log(base58.encode(transaction.serializeMessage()))
 // 下面是解析
 // transaction = Transaction.from(base58.decode(serializedTransaction))
 // console.log(serializedTransaction.toString('hex'))
@@ -42,6 +41,7 @@ transaction.sign(fromSecretKey)
 if (!transaction.verifySignatures()) {
     console.error('Signature verification failed');
 }
+console.log(base58.encode(transaction.serialize()))
 
 // let txid = await client.sendRawTransaction(transaction.serialize())
 // console.log("transaction id:", txid)
