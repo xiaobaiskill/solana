@@ -25,6 +25,7 @@ transaction.add(sendSolInstruction)
 transaction.recentBlockhash = recentBlockhash.blockhash;
 transaction.feePayer = sender;
 
+console.log(transaction)
 
 // console.log(base58.encode(transaction.serializeMessage()))
 // 下面是解析

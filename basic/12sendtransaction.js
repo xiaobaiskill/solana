@@ -36,7 +36,7 @@ async function sendLegacyTransaction() {
         ],
     }).compileToLegacyMessage();
 
-    let transaction = new Transaction(message);
+    let transaction = Transaction.populate(message)
 
     transaction.feePayer = fromKeypair.publicKey;
     console.log("legacy Transaction: ", base58.encode(transaction.serialize({ requireAllSignatures: false })))
