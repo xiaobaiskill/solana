@@ -1,9 +1,10 @@
-import { Keypair, Transaction, VersionedTransaction, TransactionMessage, TransactionInstruction, PublicKey } from "@solana/web3.js";
+import { Connection, clusterApiUrl, Keypair, Transaction, VersionedTransaction, TransactionMessage, TransactionInstruction, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 import base58 from "bs58";
 import axios from "axios";
 import { Buffer } from "buffer"
 import "dotenv/config";
 import { readFileSync } from "fs";
+import { Sleep } from "./common.js";
 
 import { mnemonicToSeedSync } from "bip39";
 import { derivePath } from "ed25519-hd-key";
@@ -21,26 +22,51 @@ var fromAddress = wallet.publicKey.toString()
 
 const data = await getRango()
 
-console.log(data)
+// console.log(data)
+const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=00b13c7b-7179-429a-9921-658d5d8ca0cd");
+
 
 const res = ToSerializeTransaction(data)
 
-console.log(res)
+// console.log(res)
 
 const TransactoinByte = base58.decode(res)
 
 
+// try {
+//     const transaction = Transaction.from(TransactoinByte)
+//     console.log("legacy:", transaction)
+//     transaction.partialSign(wallet)
+//     // transaction.sign(wallet)
+//     console.log("legacy:", base58.encode(transaction.serialize()))
+//     console.log("verifySignatures: ", transaction.verifySignatures())
 
-try {
-    const transaction = Transaction.from(TransactoinByte)
-    console.log("legacy:", transaction)
-    transaction.partialSign(wallet)
-    console.log("legacy:", transaction)
-} catch (error) {
-    const transaction = VersionedTransaction.deserialize(TransactoinByte)
-    transaction.sign([wallet])
-    console.log("versioned:", transaction)
+//     for (let i = 0; i < 30; i++) {
+//         const tx = await connection.sendRawTransaction(transaction.serialize(), {
+//             maxRetries: 3,
+//         })
+//         console.log(tx)
+//         await Sleep(1000)
+//     }
+
+// } catch (error) {
+//     console.log(error)
+
+// 好像只需要这个就可以了 (似乎及支持legacy 也支持versioned)
+const transaction = VersionedTransaction.deserialize(TransactoinByte)
+transaction.sign([wallet])
+console.log("versioned:", transaction)
+
+// 老是不打包,需要重复发送n次,才行
+for (let i = 0; i < 30; i++) {
+    const tx = await connection.sendRawTransaction(transaction.serialize(), {
+        maxRetries: 3,
+    })
+    console.log(tx)
+    await Sleep(1000)
 }
+
+// }
 
 function ToSerializeTransaction(data) {
     if (data.tx && data.tx.txType == "LEGACY") {
@@ -62,8 +88,8 @@ function ToSerializeTransaction(data) {
 
         tx.feePayer = new PublicKey(data.tx.from)
 
-        return base58.encode(tx.serialize({ verifySignatures: false }))
-        // return Buffer.from(tx.serialize({ verifySignatures: false })).toString("hex")
+        return base58.encode(tx.serialize({ requireAllSignatures: false }))
+        // return Buffer.from(tx.serialize({ requireAllSignatures: false })).toString("hex")
 
     } else if (data.tx && data.tx.txType == "VERSIONED") {
         const tx = VersionedTransaction.deserialize(data.tx.serializedMessage)
@@ -74,10 +100,8 @@ function ToSerializeTransaction(data) {
         // tx.feePayer = new PublicKey(data.tx.from)
         // console.log(tx)
 
-
         return base58.encode(tx.serialize())
-
-        // return Buffer.from(tx.serialize()).toString("hex")
+        // return Buffer.from(data.tx.serializedMessage).toString("hex")
     }
 }
 
@@ -99,7 +123,10 @@ function getInstructions(data) {
     return instruction
 }
 async function getRango() {
-    // const response = await axios.get(`https://api.rango.exchange/basic/swap?from=SOLANA.SOL&to=BSC.BNB&amount=100000000&slippage=8&fromAddress=${fromAddress}&toAddress=0x4b3524f771c94dd95d25dc1d21bad8c0f4579eae&apiKey=c6381a79-2817-4602-83bf-6a641a409e32`);
-    const response = await axios.get(`https://api.rango.exchange/basic/swap?from=SOLANA.SOL&to=SOLANA.SLERF--7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3&fromAddress=${fromAddress}&toAddress=Gj6E1oSoCV66AdnyoQBeJx4Jgeauu8S5mmBdWC4DsZxz&amount=40000000&slippage=0.5&apiKey=c6381a79-2817-4602-83bf-6a641a409e32`)
+    // LEGACY
+    // const response = await axios.get(`https://api.rango.exchange/basic/swap?from=SOLANA.SOL&to=BSC.BNB&amount=100000000&slippage=8&fromAddress=${fromAddress}&toAddress=0xE10190Ba0747c7c13b04a349E50F518B5e179B04&apiKey=c6381a79-2817-4602-83bf-6a641a409e32`);
+
+    // VersionedTransaction
+    const response = await axios.get(`https://api.rango.exchange/basic/swap?from=SOLANA.SOL&to=SOLANA.SLERF--7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3&fromAddress=${fromAddress}&toAddress=${fromAddress}&amount=30000000&slippage=0.5&apiKey=c6381a79-2817-4602-83bf-6a641a409e32`)
     return response.data
 }
