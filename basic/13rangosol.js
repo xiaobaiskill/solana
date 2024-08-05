@@ -325,7 +325,7 @@ import "dotenv/config";
 
 const data = await getRango()
 
-// console.log(data)
+console.log(data)
 
 const res = ToSerializeTransaction(data)
 
@@ -333,18 +333,16 @@ console.log(res)
 
 
 function ToSerializeTransaction(data) {
-    const txMsg = new TransactionMessage({
-        // recentBlockhash: data.tx.recentBlockhash,
-        payerKey: new PublicKey(data.tx.from),
-        instructions: [],
-    })
-
-    for (let i = 0; i < data.tx.instructions.length; i++) {
-        txMsg.instructions.push(getInstructions(data.tx.instructions[i]))
-    }
-
-
     if (data.tx && data.tx.txType == "LEGACY") {
+        const txMsg = new TransactionMessage({
+            payerKey: new PublicKey(data.tx.from),
+            instructions: [],
+        })
+
+        for (let i = 0; i < data.tx.instructions.length; i++) {
+            txMsg.instructions.push(getInstructions(data.tx.instructions[i]))
+        }
+
         const tx = Transaction.populate(txMsg.compileToLegacyMessage())
 
         data.tx.signatures.forEach(signature => {
@@ -358,7 +356,8 @@ function ToSerializeTransaction(data) {
         // data.tx.signatures.forEach(signature => {
         //     tx.addSignature(new PublicKey(signature.publicKey), Buffer.from(signature.signature))
         // });
-        tx.feePayer = new PublicKey(data.tx.from)
+        // tx.feePayer = new PublicKey(data.tx.from)
+        console.log(tx)
 
         return base58.encode(tx.serialize())
     }
