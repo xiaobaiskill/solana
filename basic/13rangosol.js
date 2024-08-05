@@ -332,9 +332,9 @@ const res = ToSerializeTransaction(data)
 console.log(res)
 
 
-function ToSerializeTransaction(data, recentBlockhash) {
+function ToSerializeTransaction(data) {
     const txMsg = new TransactionMessage({
-        recentBlockhash: data.tx.recentBlockhash,
+        // recentBlockhash: data.tx.recentBlockhash,
         payerKey: new PublicKey(data.tx.from),
         instructions: [],
     })
@@ -351,7 +351,6 @@ function ToSerializeTransaction(data, recentBlockhash) {
             tx.addSignature(new PublicKey(signature.publicKey), Buffer.from(signature.signature))
         });
 
-        tx.recentBlockhash = recentBlockhash
         return base58.encode(tx.serialize({ requireAllSignatures: false }))
     } else if (data.tx && data.tx.txType == "VERSIONED") {
         const tx = VersionedTransaction.deserialize(data.tx.serializedMessage)
@@ -359,7 +358,6 @@ function ToSerializeTransaction(data, recentBlockhash) {
         // data.tx.signatures.forEach(signature => {
         //     tx.addSignature(new PublicKey(signature.publicKey), Buffer.from(signature.signature))
         // });
-        tx.message.recentBlockhash = recentBlockhash
         tx.feePayer = new PublicKey(data.tx.from)
 
         return base58.encode(tx.serialize())
