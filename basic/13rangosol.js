@@ -352,11 +352,13 @@ function ToSerializeTransaction(data) {
         });
 
         return base58.encode(tx.serialize({ requireAllSignatures: false }))
-    } else if (data.tx && data.tx.txType == "V0") {
-        const tx = new VersionedTransaction(txMsg.compileToV0Message())
-        data.tx.signatures.forEach(signature => {
-            tx.addSignature(new PublicKey(signature.publicKey), Buffer.from(signature.signature))
-        });
+    } else if (data.tx && data.tx.txType == "VERSIONED") {
+
+        const tx = VersionedTransaction.deserialize(data.tx.serializedMessage)
+        // const tx = new VersionedTransaction(data.tx.serializedMessage)
+        // data.tx.signatures.forEach(signature => {
+        //     tx.addSignature(new PublicKey(signature.publicKey), Buffer.from(signature.signature))
+        // });
         tx.feePayer = new PublicKey(data.tx.from)
         console.log(tx)
 
@@ -382,6 +384,7 @@ function getInstructions(data) {
     return instruction
 }
 async function getRango() {
-    const response = await axios.get(`https://api.rango.exchange/basic/swap?from=SOLANA.SOL&to=ARBITRUM.ETH&fromAddress=Gj6E1oSoCV66AdnyoQBeJx4Jgeauu8S5mmBdWC4DsZxz&toAddress=0x4b3524f771c94dd95d25dc1d21bad8c0f4579eae&amount=110000000&slippage=0.5&apiKey=c6381a79-2817-4602-83bf-6a641a409e32`);
+    // const response = await axios.get(`https://api.rango.exchange/basic/swap?from=SOLANA.SOL&to=ARBITRUM.ETH&fromAddress=Gj6E1oSoCV66AdnyoQBeJx4Jgeauu8S5mmBdWC4DsZxz&toAddress=0x4b3524f771c94dd95d25dc1d21bad8c0f4579eae&amount=110000000&slippage=0.5&apiKey=c6381a79-2817-4602-83bf-6a641a409e32`);
+    const response = await axios.get("https://api.rango.exchange/basic/swap?from=SOLANA.SOL&to=SOLANA.SLERF--7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3&fromAddress=Gj6E1oSoCV66AdnyoQBeJx4Jgeauu8S5mmBdWC4DsZxz&toAddress=Gj6E1oSoCV66AdnyoQBeJx4Jgeauu8S5mmBdWC4DsZxz&amount=40000000&slippage=0.5&apiKey=c6381a79-2817-4602-83bf-6a641a409e32")
     return response.data
 }
