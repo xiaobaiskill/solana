@@ -1,5 +1,5 @@
-import { Connection, Keypair, PublicKey, clusterApiUrl } from "@solana/web3.js";
-import { createAssociatedTokenAccount, getAssociatedTokenAddress, transferChecked } from "@solana/spl-token";
+import { Connection, Keypair, PublicKey, clusterApiUrl, VersionedTransaction } from "@solana/web3.js";
+import { createAssociatedTokenAccount, createAssociatedTokenAccountInstruction, getAssociatedTokenAddress, transferChecked } from "@solana/spl-token";
 import base58 from "bs58"
 import { Sleep } from "./common.js";
 import "dotenv/config";
